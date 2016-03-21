@@ -1,0 +1,3 @@
+*.db
+connect_db.rb
+.idea/

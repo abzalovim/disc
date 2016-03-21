@@ -6,5 +6,5 @@ require './connect_db.rb'
 DB.create_table?(:cashes)do
 	primary_key :id
 	String :names
-	String :email, :empty => false, :unique => true
+	Integer :percent, :default => 10
 end
