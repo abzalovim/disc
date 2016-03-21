@@ -1,8 +1,9 @@
 # Gemfile  
-source :rubygems  
+source :rubygems
 
-gem 'sinatra'  
-gem 'unicorn'  
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'unicorn'
 gem 'capistrano'  
 gem "rvm-capistrano"  
 gem 'sequel'
