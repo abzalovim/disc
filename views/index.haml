@@ -1,0 +1,11 @@
+%table{:class=>"table table-striped"}
+  %thead
+    %th='Номер'
+    %th='Наименование'
+    %th='Разрешенный процент'
+  %tbody
+    - @cashes.each do |row|
+      %tr
+        %td=row[:id]
+        %td=row[:name]
+        %td=row[:cashe_percent]
