@@ -27,7 +27,6 @@ get '/cards/:cashe/:check_id/:barcode/:payment/:sum_out/:sum_in' do
   value = 0-str_sum.to_f
   Bonus.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value})
 
-  p "#{params[:check_id]} : #{params[:barcode]} : #{params[:payment]} : #{params[:sum_out]} : #{params[:sum_in]}"
   sum_in = params[:sum_in]
   value = sum_in.to_f
   Bonus.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value})
@@ -36,6 +35,5 @@ get '/cards/:cashe/:check_id/:barcode/:payment/:sum_out/:sum_in' do
   value = payment.to_f
   
   Payment.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value})
-  p "Payment: #{card_id} : #{params[:cashe]} : #{params[:check_id]} : #{value}"
-  
+  haml :null, :layout => nil
 end
