@@ -18,9 +18,10 @@ function reRun(RO) {
 
 function getUrl(AO, RO, POS, CO, UP) {
     var xmlhttp = getXmlHttp();
-    url="http://192.168.0.8:4567";
-    // IE êýøèðóåò XMLHttpRequest çàïðîñû, òàê ÷òî äîáàâëÿåì ñëó÷àéíûé ïàðàìåòð ê URL
-    // (õîòÿ ìîæíî îáîéòèñü ïðàâèëüíûìè çàãîëîâêàìè íà ñåðâåðå)
+    url="http://10.0.2.2:4567";
+    //url="http://192.168.0.8:4567";
+    // IE кэширует XMLHttpRequest запросы, так что добавляем случайный параметр к URL
+    // (хотя можно обойтись правильными заголовками на сервере)
 
     RO.UserValues.Set('DiscountValue',0);
     pos_id = RO.NShop.toString();
@@ -40,7 +41,7 @@ function getUrl(AO, RO, POS, CO, UP) {
     }
 
     counter=0;
-    AO.ShowMessage('Ïðîâåðÿåì áàëàíñ êàðòû',Icon.Exclamation,2);
+    AO.ShowMessage('Проверяем баланс карты',Icon.Exclamation,2);
     if (xmlhttp.readyState == 4) {
         var data = eval('('+xmlhttp.responseText+')');
         sUsedBonus = data['bonuses'].toString();
@@ -52,7 +53,7 @@ function getUrl(AO, RO, POS, CO, UP) {
     }
     else
     {
-        AO.ShowMessage('Íåò ñâÿçè ñ ñåðâåðîì!');
+        AO.ShowMessage('Нет связи с сервером!');
     }
 }
 

@@ -34,6 +34,8 @@ get '/cards/:cashe/:check_id/:barcode/:payment/:sum_out/:sum_in' do
 
   payment = params[:payment]
   value = payment.to_f
+  
   Payment.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value})
-
+  p "Payment: #{card_id} : #{params[:cashe]} : #{params[:check_id]} : #{value}"
+  
 end
