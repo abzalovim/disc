@@ -1,6 +1,6 @@
 function urlServ()
 {
-    return "192.168.0.18:4567"
+    return "http://192.168.0.18:4567"
 }
 
 function typeCard(barcode)
