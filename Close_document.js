@@ -1,6 +1,6 @@
 function urlServ()
 {
-    return "http://192.168.0.18:4567"
+    return "http://192.168.0.8:4567"
 }
 
 function typeCard(barcode)
@@ -36,13 +36,15 @@ function AfterAct(AO, RO, E, O, CO)
 {
     if (RO.ReceiptTypeCode != 1) //Только документ продажи
         return;
+    if (RO.UserValues.Get('Ready') != '2') //Только обработанный дисконт
+        return;
     if ((RO.Card.Count != 0) && (RO.Disc.Count != 0))                       //Если количество введенных карт не = 0
     {
         RO.Card.Index = 1;
         barcode = RO.Card.Value;
         pos_id = RO.NShop.toString();
         doc_no = RO.ReceiptNo.toString();
-        payment= RO.SummWD.toString();
+        payment= RO.SummWD;
 
         var xmlhttp = getXmlHttp();
         url=urlServ();
@@ -56,13 +58,17 @@ function AfterAct(AO, RO, E, O, CO)
                  RO.Disc.Index++) {
                 UsedBonus = 0;
                 if ((RO.Disc.KindD == 2) && (RO.Disc.TypeD == 1))
+                {
                     UsedBonus = RO.Disc.Value;
+                    payment=payment+UsedBonus;
+                }
             }
 
             sUsedBonus = UsedBonus.toString();
 
+            payment = payment.toString();
 
-            NewBonus = RO.SummWD * percent / 100;
+            NewBonus = Math.round(RO.SummForD * percent / 100);
             sNewBonus = NewBonus.toString();
             prms = pos_id + "/" + doc_no + "/" + barcode + '/' + payment + '/' + sUsedBonus + '/' + sNewBonus;
             if (typeCard(barcode) == 1)
