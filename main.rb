@@ -2,7 +2,7 @@ require 'sinatra'
 require 'sinatra/json'
 require './bd_uses.rb'
 require 'haml'
-require "sinatra/reloader" if development?
+# require "sinatra/reloader" if development?
 
 get '/' do
   @cashes = Cashe.order(:name).all

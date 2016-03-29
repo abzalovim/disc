@@ -5,12 +5,17 @@ GEM
     haml (4.0.7)
       tilt
     multi_json (1.11.2)
+    pg (0.18.4)
+    pg (0.18.4-x86-mingw32)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
     sequel (4.32.0)
+    sequel_pg (1.6.14)
+      pg (>= 0.8.0)
+      sequel (>= 3.39.0)
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -33,6 +38,7 @@ PLATFORMS
 DEPENDENCIES
   haml
   sequel
+  sequel_pg
   sinatra
   sinatra-contrib
   sqlite3

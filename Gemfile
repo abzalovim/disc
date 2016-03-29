@@ -7,5 +7,6 @@ gem 'sinatra-contrib'
 #gem 'capistrano'  
 #gem "rvm-capistrano"  
 gem 'sequel'
-gem 'sqlite3'  
+gem 'sequel_pg'
+gem 'sqlite3'
 gem 'haml'
