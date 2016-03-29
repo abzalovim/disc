@@ -68,7 +68,7 @@ function AfterAct(AO, RO, E, O, CO)
 
             payment = payment.toString();
 
-            NewBonus = Math.round(RO.SummForD * percent / 100);
+            NewBonus = Math.ceil(RO.SummForD * percent / 100);
             sNewBonus = NewBonus.toString();
             prms = pos_id + "/" + doc_no + "/" + barcode + '/' + payment + '/' + sUsedBonus + '/' + sNewBonus;
             if (typeCard(barcode) == 1)
