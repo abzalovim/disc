@@ -9,16 +9,19 @@ get '/' do
   haml :index
 end
 
-get '/cards/:cashe/:barcode/:pin' do
+get '/cards/:cashe/:barcode/:pin', :provides => [:json, :xml] do
   # card balanse
-  DB[:cashes].insert_ignore.insert(:id=>params[:cashe], :name=>"Касса №#{params[:cashe]}")
-  DB[:cards].insert_ignore.insert(:barcode=>params[:barcode])
+  DB[:cashes].insert(:id=>params[:cashe], :name=>"Касса №#{params[:cashe]}") if Cashe[params[:cashe]].nil?
+  DB[:cards].insert_conflict.insert(:barcode=>params[:barcode]) if Card[{:barcode=>params[:barcode]}].nil?
   @resp = {}
   @resp[:cashe_percent]=DB[:cashes].where(:id=>params[:cashe]).get(:cashe_percent)
   @resp[:card_percent]=DB[:cards].where(:barcode=>params[:barcode]).get(:card_percent)
   @card_value = DB[:cards].where(:barcode=>params[:barcode]).left_join(:bonuses, :card_id=>:id).sum(:value)
   @resp[:bonuses] = @card_value.nil? ? 0 : @card_value
-  json @resp, :layout => nil
+  respond_to do |f|
+    f.json{ json @resp, :layout => nil }
+    f.xml{ XmlSimple.xml_out(@resp, {:keeproot => true, :noescape => true}) }
+  end
 end
 
 get '/cards/:cashe/:check_id/:barcode/:payment/:sum_out/:sum_in' do
