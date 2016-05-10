@@ -1,6 +1,7 @@
 /**
  * Created by salimbek on 10.05.16.
  */
+    percent = RO.UserValues.Get('ReturnValue');
 function PrintHeader(PO, RO, CO)
 {
     if (RO.UserValues.Get('Ready')=='2') {
@@ -14,7 +15,7 @@ function PrintHeader(PO, RO, CO)
 function PrintPosition(PO, RO, CO)
 {
     if (RO.Pos.Storno == 1)
-        PO.PrintCenterString("ÑÒÎÐÍÎ"," ");
+        PO.PrintCenterString("СТОРНО"," ");
 
     if (RO.Pos.Storno == 0)
     {
@@ -26,12 +27,12 @@ function PrintPosition(PO, RO, CO)
 function PrintFooter(PO, RO, CO)
 {
     if(RO.ClientCard != "")
-        PO.PrintStringWordWrap("Êàðòà: "+RO.ClientCard);
+        PO.PrintStringWordWrap("Карта: "+RO.ClientCard);
 
     PO.PrintStringWordWrap(" ");
-    PO.PrintCenterString("Èíôîðìàöèÿ ïî áîíóñàì:"," ");
+    PO.PrintCenterString("Информация по бонусам:"," ");
 
-    for (RO.Disc.Index = 1;                                             //Ïåðåáèðàåì ñ÷åò÷èêè
+    for (RO.Disc.Index = 1;                                             //Перебираем счетчики
          RO.Disc.Index <=
          RO.Disc.Count;
          RO.Disc.Index++) {
@@ -46,7 +47,7 @@ function PrintFooter(PO, RO, CO)
     percent = RO.UserValues.Get('ReturnValue');
     NewBonus = Math.ceil(RO.SummWD * percent / 100);
     sNewBonus = NewBonus.toString();
-    PO.PrintStringWordWrap("Ñïèñàíî:         "+UsedBonus.toString());
-    PO.PrintStringWordWrap("Íà÷èñëåíî:       "+sNewBonus);
-    PO.PrintStringWordWrap("Òåêóùèé îñòàòîê: "+(maxDisc-UsedBonus+NewBonus).toString());
+    PO.PrintStringWordWrap("Списано:         "+UsedBonus.toString());
+    PO.PrintStringWordWrap("Начислено:       "+sNewBonus);
+    PO.PrintStringWordWrap("Текущий остаток: "+(maxDisc-UsedBonus+NewBonus).toString());
 }
