@@ -14,6 +14,14 @@ function typeCard(barcode)
     return flag;
 }
 
+function cCard(barcode)
+{
+    prefix = barcode.substr(0,4);
+    if (prefix == '1300') barcode='0'+barcode;
+    if (prefix == '1500') barcode='0'+barcode;
+    return barcode;
+}
+
 function getXmlHttp(){
     try {
         return new ActiveXObject("Microsoft.XMLDOM");;
@@ -35,7 +43,7 @@ function AfterAct(AO, RO, E, O, CO)
     if ((RO.Card.Count != 0) && (RO.Disc.Count != 0))                       //Если количество введенных карт не = 0
     {
         RO.Card.Index = 1;
-        barcode = RO.Card.Value;
+        barcode = cCard(RO.Card.Value);
         pos_id = RO.NShop.toString();
         doc_no = RO.ReceiptNo.toString();
         payment= RO.SummWD;

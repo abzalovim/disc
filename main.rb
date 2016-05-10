@@ -36,15 +36,18 @@ get '/cards/:cashe/:check_id/:barcode/:payment/:sum_out/:sum_in' do
   card_id = DB[:cards].where(:barcode=>params[:barcode]).get(:id)
   str_sum = params[:sum_out]
   value = 0-str_sum.to_f
+  p "used: #{value}"
   Bonus.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value}) unless value==0
 
   sum_in = params[:sum_in]
   value = sum_in.to_f
+  p "added: #{value}"
   Bonus.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value}) unless value==0
 
   payment = params[:payment]
   value = payment.to_f
-  
+  p "payed: #{value}"
+
   Payment.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value})
   haml :null, :layout => nil
 end
