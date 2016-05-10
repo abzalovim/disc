@@ -8,7 +8,7 @@ function getDiscount(AO, RO, POS, CO, UV)
     //AO.ShowMessage(typeof(v2)+'-'+v2);
     ret = Math.min(v1,v2);
     //AO.ShowMessage('ret:'+ret);
-    return Math.min(v1,v2);
+    return ret;
 }
 
 function q(AO, RO, POS, CO, UV)

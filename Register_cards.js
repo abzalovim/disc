@@ -6,9 +6,9 @@ function urlServ()
 function typeCard(barcode)
 {
     flag = 0;
-    prefix = barcode.substr(0,5);
-    if ((prefix == '01300') || (prefix == '13001')) flag = 1;
-    if ((prefix == '01500') || (prefix == '15001')) flag = 3;
+    prefix = barcode.substr(0,4);
+    if ((prefix == '0130') || (prefix == '1300')) flag = 1;
+    if ((prefix == '0150') || (prefix == '1500')) flag = 3;
     prefix = barcode.substr(0,2);
     if (prefix == '79') flag = 2;
     return flag;
@@ -16,8 +16,9 @@ function typeCard(barcode)
 
 function cCard(barcode)
 {
-    prefix = barcode.substr(0,5);
-    if (prefix == '13001') barcode='0'+barcode;
+    prefix = barcode.substr(0,4);
+    if (prefix == '1300') barcode='0'+barcode;
+    if (prefix == '1500') barcode='0'+barcode;
     return barcode;
 }
 
@@ -67,7 +68,14 @@ function BeforeAct(AO, RO, E, O, CO)
         cashe_p = xmlhttp.getElementsByTagName("cashe_percent")[0].text;
         card_p = xmlhttp.getElementsByTagName("card_percent")[0].text;
         if (tCard==1) {
-            repl = xmlhttp.getElementsByTagName("replace")[0].text;
+            repl = xmlhttp.getElementsByTagName("replace")[0];
+            if (repl==undefined) {
+                repl="2";
+            }
+            else
+            {
+                repl= repl.text;
+            }
             if (repl == "3") {
                 AO.ShowError("Данная карта была заменена!");
             }
@@ -77,7 +85,7 @@ function BeforeAct(AO, RO, E, O, CO)
                     repl="2";
                 }
                 else {
-                    resp = AO.ShowMessage("Подтвердите новую карту:"+\n+n_card,Button.YesNoCancel);
+                    resp = AO.ShowMessage("Подтвердите новую карту:\n"+n_card,Button.YesNoCancel);
                     if (resp==DialogResult.Yes) {
                         gUrl = url+'/replace/'+barcode+'/'+n_card;
                         xmlhttp.load(gUrl);
@@ -103,7 +111,7 @@ function BeforeAct(AO, RO, E, O, CO)
     }
     else
     {
-        AO.ShowError('Нет связи с сервером!',Icon.Stop,5);
+        AO.ShowError('Нет связи с сервером!');
     }
 }
 
