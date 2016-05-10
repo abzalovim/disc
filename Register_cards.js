@@ -8,6 +8,7 @@ function typeCard(barcode)
     flag = 0;
     prefix = barcode.substr(0,5);
     if ((prefix == '01300') || (prefix == '13001')) flag = 1;
+    if ((prefix == '01500') || (prefix == '15001')) flag = 3;
     prefix = barcode.substr(0,2);
     if (prefix == '79') flag = 2;
     return flag;
@@ -23,17 +24,10 @@ function cCard(barcode)
 function getXmlHttp()
 {
     try {
-        return new ActiveXObject("Msxml2.XMLHTTP");
+        return new ActiveXObject("Microsoft.XMLDOM");;
     } catch (e) {
-        try {
-            return new ActiveXObject("Microsoft.XMLHTTP");
-        } catch (ee) {
-        }
+        return false
     }
-    if (typeof XMLHttpRequest!='undefined') {
-        return new XMLHttpRequest();
-    }
-    else {return false}
 }
 
 function BeforeAct(AO, RO, E, O, CO)
@@ -57,36 +51,59 @@ function BeforeAct(AO, RO, E, O, CO)
 
     RO.UserValues.Set('Ready','');
     if (tCard==1) {
-        gUrl = url+'/cards/'+pos_id+'/'+cCard(barcode)+'/'+Math.random();
+        gUrl = url+'/cards/'+pos_id+'/'+cCard(barcode)+'/'+Math.random()+'/xml';
+    }
+    else if (tCard==3) {
+        gUrl = url+'/cards/'+pos_id+'/'+cCard(barcode)+'/'+Math.random()+'/xml';
     }
     else
     {
-        gUrl = url+'/clients/'+pos_id+'/'+barcode+'/'+Math.random();
+        gUrl = url+'/clients/'+pos_id+'/'+barcode+'/'+Math.random()+'/xml';
     }
-    xmlhttp.open("GET", gUrl);
-    xmlhttp.send(null);
-    xmlhttp.onreadystatechange = function() {
-        if ((xmlhttp.readyState == 4) && (xmlhttp.status == 200)) {
-            RO.UserValues.Set('Ready','1');
-        }
-    };
+    xmlhttp.async = false;
+    r = xmlhttp.load(gUrl);
+    if (r) {
+        sUsedBonus = xmlhttp.getElementsByTagName("bonuses")[0].text;
+        cashe_p = xmlhttp.getElementsByTagName("cashe_percent")[0].text;
+        card_p = xmlhttp.getElementsByTagName("card_percent")[0].text;
+        if (tCard==1) {
+            repl = xmlhttp.getElementsByTagName("replace")[0].text;
+            if (repl == "3") {
+                AO.ShowError("Данная карта была заменена!");
+            }
+            while (repl=="1") {
+                n_card = AO.InputString("Введите НОВУЮ карту!","",13);
+                if (n_card==null) {
+                    repl="2";
+                }
+                else {
+                    resp = AO.ShowMessage("Подтвердите новую карту:"+\n+n_card,Button.YesNoCancel);
+                    if (resp==DialogResult.Yes) {
+                        gUrl = url+'/replace/'+barcode+'/'+n_card;
+                        xmlhttp.load(gUrl);
+                        repl="2";
+                        barcode = n_card;
+                    }
+                    else if (resp==DialogResult.Cancel) {
+                        repl="2";
+                    }
+                }
 
-    counter=0;
-    AO.ShowMessage('Проверяем баланс карты',Icon.Exclamation,2);
-    if (xmlhttp.status == 200) {
-        var data = eval('('+xmlhttp.responseText+')');
+            }
+            //AO.ShowError('Нет связи с сервером!',Icon.Stop,5);
+        }
         if ((tCard == 2) && (data['cashe_percent']<0))
             AO.ShowError ("Номер телефона не известен");
-        sUsedBonus = data['bonuses'].toString();
+        UsedBonus = parseFloat(sUsedBonus);
 
-        RO.UserValues.Set('DiscountValue',data['bonuses']);
-        RO.UserValues.Set('ReturnValue',Math.max(data['cashe_percent'],data['card_percent']));
+        RO.UserValues.Set('DiscountValue',UsedBonus);
+        RO.UserValues.Set('ReturnValue',Math.max(cashe_p,card_p));
         RO.UserValues.Set('Ready','2');
         AO.ShowMessage('На карте '+sUsedBonus+' рублей',Icon.Asterisk);
     }
     else
     {
-        AO.ShowMessage('Нет связи с сервером!',Icon.Stop,5);
+        AO.ShowError('Нет связи с сервером!',Icon.Stop,5);
     }
 }
 

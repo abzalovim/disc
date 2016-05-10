@@ -6,8 +6,9 @@ function urlServ()
 function typeCard(barcode)
 {
     flag = 0;
-    prefix = barcode.substr(0,5);
-    if ((prefix == '01300') || (prefix == '13001')) flag = 1;
+    prefix = barcode.substr(0,4);
+    if ((prefix == '0130') || (prefix == '1300')) flag = 1;
+    if ((prefix == '0150') || (prefix == '1500')) flag = 1;
     prefix = barcode.substr(0,2);
     if (prefix == '79') flag = 2;
     return flag;
@@ -15,17 +16,10 @@ function typeCard(barcode)
 
 function getXmlHttp(){
     try {
-        return new ActiveXObject("Msxml2.XMLHTTP");
+        return new ActiveXObject("Microsoft.XMLDOM");;
     } catch (e) {
-        try {
-            return new ActiveXObject("Microsoft.XMLHTTP");
-        } catch (ee) {
-        }
+        return false
     }
-    if (typeof XMLHttpRequest!='undefined') {
-        return new XMLHttpRequest();
-    }
-    else {return false}
 }
 
 function BeforeAct(AO, RO, E, O, CO)
@@ -60,7 +54,7 @@ function AfterAct(AO, RO, E, O, CO)
                 if ((RO.Disc.KindD == 2) && (RO.Disc.TypeD == 1))
                 {
                     UsedBonus = RO.Disc.Value;
-                    payment=payment+UsedBonus;
+                    //payment=payment+UsedBonus;
                 }
             }
 
@@ -68,15 +62,14 @@ function AfterAct(AO, RO, E, O, CO)
 
             payment = payment.toString();
 
-            NewBonus = Math.ceil(RO.SummForD * percent / 100);
+            NewBonus = Math.ceil(RO.SummWD * percent / 100);
             sNewBonus = NewBonus.toString();
             prms = pos_id + "/" + doc_no + "/" + barcode + '/' + payment + '/' + sUsedBonus + '/' + sNewBonus;
             if (typeCard(barcode) == 1)
                 prms = "/cards/" + prms;
             else
                 prms = "/clients/" + prms;
-            xmlhttp.open("GET", url + prms);
-            xmlhttp.send(null);
+            xmlhttp.load(url + prms);
             if (NewBonus != 0)
                 AO.ShowMessage('На карту начислено ' + sNewBonus + ' рублей', Icon.Exclamation, 5);
         }

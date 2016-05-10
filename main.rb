@@ -48,3 +48,7 @@ get '/cards/:cashe/:check_id/:barcode/:payment/:sum_out/:sum_in' do
   Payment.create({:card_id => card_id, :cashe_id => params[:cashe], :check_id => params[:check_id], :value => value})
   haml :null, :layout => nil
 end
+
+get '/replace' do
+  haml :replace
+end
