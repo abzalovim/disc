@@ -2,11 +2,20 @@
 %html
   %head
     %title БД Галатея
-    %link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
-    %link(rel="stylesheet" href="/bootstrap/css/bootstrap-responsive.min.css")
-    %script(src="/bootstrap/js/bootstrap.min.js")
-    %script(src="/jquery.min.js")
+    %script(src="/js/jquery.min.js")
+    %script(src="/js/moment-with-locales.min.js")
+    %script(src="/js/bootstrap.min.js")
+    %script(src="/js/bootstrap-datetimepicker.min.js")
+    %script(src="/js/bootstrap-formhelpers-phone.js")
+    %link(rel="stylesheet" href="/css/bootstrap.min.css")
+    %link(rel="stylesheet" href="/css/bootstrap-datetimepicker.min.css")
   %body
     .row
-      %img.col-md-offset-4.col-md-3.col-xs-12(src="/img/brands.png")
+      %img.col-lg-offset-3.col-lg-5.col-md-offset-2.col-md-7.col-sm-offset-1.col-sm-9.col-xs-12(src="/img/brands.png")
+    .row.navbar-nav.navbar-default.col-md-11
+      =haml :navbar
+    .row.nav.navbar-nav.navbar-right.col-md-1
+      - if session['cashe_id'].nil? then nav={'Войти' => '/start'}
+      - else nav = {session['user'] => {'Выйти' => '/logout'}}
+      =haml :nav_ul, locals: {nav: nav}
     = yield

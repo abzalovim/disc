@@ -1,0 +1,27 @@
+!!!
+%html
+  %head
+    %title БД Галатея
+    %script(src="/js/jquery.min.js")
+    %script(src="/js/bootstrap.min.js")
+    %link(rel="stylesheet" href="/css/bootstrap.min.css")
+  %body
+    .row
+      %img.col-lg-offset-3.col-lg-5.col-md-offset-2.col-md-7.col-sm-offset-1.col-sm-9.col-xs-12(src="/img/brands.png")
+    %form#components.form-horizontal{role: "form", method: "post"}
+      .container-fluid
+        .row
+          %label.col-md-4.control-label
+          %label.col-md-4
+            %h1 Выберите магазин:
+        .row.content
+          %label.col-md-4.text-primary.control-label{for: "user"} Магазин:
+          .col-md-4
+            %select.col-md-10{name: "user"}
+              - @cashes.each do |item|
+                %option{:name => item.id, :value=> item.id}="#{item.name}"
+        .row
+          %label
+        .row
+          %button.submit.col-md-1.col-md-offset-5
+            Войти

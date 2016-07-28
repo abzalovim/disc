@@ -1,0 +1,14 @@
+.container
+  .navbar-header
+    %button.navbar-toggle{"data-target" => "#navbar-main", "data-toggle" => "collapse", type: "button"}
+      %span.icon-bar
+      %span.icon-bar
+      %span.icon-bar
+  #navbar-main.navbar-collapse.collapse
+    %ul.nav.navbar-nav
+      %li
+        %a{href: to('/clients')}='Клиенты'
+      -#%li
+      -#  %a{href: to('#')}=''
+      -#%li
+      -#  %a{href: to('#')}=''
