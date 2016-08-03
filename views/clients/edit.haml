@@ -1,0 +1,74 @@
+%form#components.form-horizontal{role: "form", method: "post"}
+  .row
+    %label.col-md-4.control-label
+    %label.col-md-4
+      %h1 Замена карты клиента
+  .container-fluid
+    %ul.nav.nav-tabs.col-md-8.col-md-offset-2
+      - cls = session['secret_type']!="2" ? "active" : ""
+      %li.nav{name: "p_name", value: 1, class: cls}
+        %a{"data-toggle" => "tab", href: "#panel1"} Замена карты
+      - cls = session['secret_type']=="2" ? "active" : ""
+      %li.nav{name: "p_name", value: 2, class: cls}
+        %a{"data-toggle" => "tab", href: "#panel2"} Расширенное редактирование
+  .row
+    %label
+    .tab-content
+      - cls = session['secret_type']!="2" ? "in active" : ""
+      #panel1.tab-pane.fade{class: cls}
+        .row.content
+          %label.col-md-4.text-primary.control-label{for: "p1_old_cart"} Прежняя карта
+          .col-md-4
+            %input#p1_old_cart.form-control.af.input-md.bfh-phone{name: "p1_old_cart", next_id: "#p1_new_cart", placeholder: "01300 00000 000", autocomplete: "off", :type => "tel", "data-format" => "ddddd ddddd ddd", value: @@hsh[:cart]}/
+          .col-md-2
+            .flash#flash.alert-danger
+              =session['secret1']
+              -session['secret1']=''
+        .row
+          %label.control-label.col-md-4
+        .row.content
+          %label.col-md-4.text-primary.control-label{for: "p1_new_cart"} Новая карта
+          .col-md-4
+            %input#p1_new_cart.form-control.af.input-md.bfh-phone{name: "p1_new_cart", next_id: "#bt", placeholder: "01500 00000 000", autocomplete: "off", :type => "tel", "data-format" => "ddddd ddddd ddd", value:@@hsh[:new_cart]}/
+          .col-md-2
+            .flash#flash.alert-danger
+              =session['secret2']
+              -session['secret2']=''
+        .row
+          %label.control-label.col-md-4
+        .row
+          %button#bt.submit.col-md-2.col-md-offset-5
+            Проверить карту
+      - cls = session['secret_type']=="2" ? "in active" : ""
+      #panel2.tab-pane.fade{class: cls}
+        =haml :'clients/full'
+      - session['secret_type']=""
+:javascript
+  $(function() {
+    $('#flash').delay(500).fadeIn('normal', function() {
+      $(this).delay(2500).fadeOut();
+    });
+  });
+  $('input.af').on('keydown', function(event) {
+    if (event.keyCode == 13) {
+      nxt  = $(this).attr("next_id");
+      if(nxt){
+        console.log(this.name+'=>'+this.value);
+        $(nxt).focus();
+        event.preventDefault();
+      };
+    }
+  });
+  $("form").submit(function(eventObj) {
+    var ul = "";
+    $('li.nav').each(function() {
+      if($(this).hasClass('active')){
+        ul += $(this).val()
+      }
+    });
+    $('<input />').attr('type', 'hidden')
+        .attr('name', "tab")
+        .attr('value', ul)
+        .appendTo('#components');
+    return true;
+  });

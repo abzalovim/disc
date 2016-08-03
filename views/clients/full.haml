@@ -1,0 +1,88 @@
+.container-fluid
+  .row.content
+    %label.col-md-4.control-label{for: "cart"} Карта
+    .col-md-4
+      %input#cart.form-control.input-md{name: "cart", placeholder: "Новая карта клиента", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+  .row.content
+    %label.col-md-4.control-label{for: "surname"} Фамилия
+    .col-md-4
+      %input#surname.form-control.af.input-md{name: "surname", placeholder: "Фамилия клиента", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+  .row
+    %label.col-md-4.control-label{for: "name"} Имя
+    .col-md-4
+      %input#name.form-control.input-md{name: "name", placeholder: "Имя клиента", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+  .row
+    %label.col-md-4.control-label{for: "lastname"} Отчество
+    .col-md-4
+      %input#lastname.form-control.input-md{name: "lastname", placeholder: "Отчество клиента", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+  .row
+    %label.col-md-4.control-label{for: "city"} Город
+    .col-md-4
+      %input#city.form-control.input-md{name: "city", placeholder: "Город", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}
+  .row
+    %label.col-md-4.control-label{for: "mobile"} Телефон мобильный
+    .col-md-4
+      %input#phone.form-control.bfh-phone{"data-format" => "+7 (ddd) ddd-dddd", autocomplete: "off", :name => "phone", :type => "tel", :value => ""}
+  .row
+    %label.col-sm-4.col-xs-5.control-label{for: "fl_pol"}  Пол
+    .col-sm-4.col-xs-3
+      %label.radio-inline
+        %input{:name => "fl_pol", :type => "radio", :value => 'm'}
+        М
+      %label.radio-inline
+        %input{:name => "fl_pol", :type => "radio", :value => 'f', :checked => 1}
+        Ж
+  .row
+    %label.control-label.col-md-4
+  .row
+    %label.control-label.col-xs-4.col-md-4 Дата рождения:
+    .col-md-4.col-xs-4{:id=>"datepicker"}
+      %label.input-group.date
+        %input#birthday.form-control{:name => "birthday", :type => "text", autocomplete: "off"}
+        %span.input-group-addon
+          %i.glyphicon.glyphicon-th
+  .row
+    %label.col-sm-4.col-xs-5.control-label{for: "sms"} Соглашаюсь с СМС-рассылкой
+    .col-sm-1.col-xs-1
+      %input#textinput.form-control.input{name: "sms", type: "checkbox", checked:1}
+  .row
+    %label.col-sm-4.col-xs-5.control-label{for: "bonuses"} Начислить бонусы
+    .col-sm-1.col-xs-1
+      %input#fl_bonuses.fl_check.form-control.input{name: "fl_bonuses", in_id: "#bonuses", type: "checkbox", value: false}
+    .col-sm-3.col-xs-6
+      %input#bonuses.form-control.input-md{hidden: 1, name: "bonuses", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}
+  .row
+    %label.col-sm-4.col-xs-5.control-label{for: "old_cart"} Заменить карту
+    .col-sm-1.col-xs-1
+      %input#fl_old_cart.fl_check.form-control.input{name: "fl_old_cart", in_id: "#old_cart", type: "checkbox"}
+    .col-sm-3.col-xs-6
+      %input#old_cart.form-control.input-md{hidden: 1, name: "old_cart", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}
+
+  .row
+    %label.control-label.col-md-4
+  .row
+    %button.submit.col-md-3.col-md-offset-4
+      Сохранить анкету
+
+:javascript
+  $("#datepicker").datetimepicker({
+        language: 'ru',
+        pickTime: false,
+        defaultDate: "01.01.1980",
+        viewMode: 'years',
+        autoclose: true
+      });
+  $(document).ready(function() {
+        $('#fl_bonuses')[0].checked=false;
+        $('#fl_old_cart')[0].checked=false;
+
+        $('#bonuses').hide();
+        $('#old_cart').hide();
+  });
+  $('input.fl_check').click(function(e){
+    in_id=$(this).attr("in_id");
+    $(in_id).toggle();
+    if(this.checked) {
+      $(in_id).focus();
+    };
+  });

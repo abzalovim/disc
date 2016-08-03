@@ -14,7 +14,7 @@ stdout_path "/var/www/disc/logs/unicorn.log"
 
 # Unicorn socket
 # listen "/tmp/unicorn.[app name].sock"
-listen "/var/www/disc/sockets/unicorn.disc.sock"
+listen "127.0.0.1:3003"
 
 # Number of processes
 # worker_processes 4

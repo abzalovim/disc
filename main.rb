@@ -6,8 +6,6 @@ require 'xmlsimple'
 require 'sinatra/respond_with'
 require "sinatra/reloader" if development?
 
-enable :sessions
-
 get '/' do
   @cashes = Cashe.order(:name).all
   haml :index
@@ -20,7 +18,7 @@ end
 
 post '/start' do
   session['cashe_id']=params['user']
-  session['user']=Cashe[session['cashe_id']].name
+  session['user']=Cashe[params['user']].name
   redirect to('/')
 end
 
@@ -86,30 +84,41 @@ end
 post '/clients.ajax' do
   cart=params["cart"]
   unless cart.empty?
-    return json DB[:clients].where(:id=>DB[:cards].where(:barcode=>cart).select(:client_id)).limit(20).all
+    cart="0"+cart if cart[0]!="0"
+    session['cart']=cart
+    return json DB[:clients].left_join(:cards, :client_id=>:id).left_join(:bonuses, :card_id=>:id).where(:clients__id=>DB[:cards].where(:barcode=>cart).select(:client_id))\
+                    .group(:clients__id).select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile,:cards__barcode___cart)\
+                    .select_append{sum(:value).as(bonus)}.limit(20).all
   end
   filter=params["filter"]
   unless filter.empty?
     str=""
     filter.split(' ').each { |fl|
       if str==""
-        str=Sequel.|(Sequel.ilike(:family,"%#{fl}%"),Sequel.ilike(:name,"%#{fl}%"),Sequel.ilike(:surname,"%#{fl}%"),Sequel.ilike(:mobile,"%#{fl}%"))
+        str=Sequel.|(Sequel.ilike(:family,"#{fl}%"),Sequel.ilike(:name,"#{fl}%"),Sequel.ilike(:surname,"#{fl}%"),Sequel.ilike(:mobile,"%#{fl}"))
       else
-        str=Sequel.&(str,Sequel.|(Sequel.ilike(:family,"%#{fl}%"),Sequel.ilike(:name,"%#{fl}%"),Sequel.ilike(:surname,"%#{fl}%"),Sequel.ilike(:mobile,"%#{fl}%")))
+        str=Sequel.&(str,Sequel.|(Sequel.ilike(:family,"#{fl}%"),Sequel.ilike(:name,"#{fl}%"),Sequel.ilike(:surname,"#{fl}%"),Sequel.ilike(:mobile,"%#{fl}")))
       end
     }
-    return json DB[:clients].where(str).limit(20).all
+    return json DB[:clients].left_join(:cards, :client_id=>:id).left_join(:bonuses, :card_id=>:id).where(str)\
+                    .group(:clients__id).select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile,:cards__barcode___cart)\
+                    .select_append{sum(:value).as(bonus)}.limit(20).all
   end
-  json DB[:clients].limit(20).all
+  json DB[:clients].left_join(:cards, :client_id=>:id).left_join(:bonuses, :card_id=>:id).group(:clients__id)\
+                    .select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile,:cards__barcode___cart)\
+                    .select_append{sum(:value).as(bonus)}.limit(20).all
   #json { :domain => domain, :info => {:available => info.available?, :registered => info.registered?, :expires => info.expires_on} } unless info.nil?
 end
 
 get '/client/cart' do
+  @hsh={:cart=>session['cart']}
+  session['cart']=''
   haml :'clients/cart'
 end
 
 post '/client/cart' do
   cart=params["cart"];
+  session['cart']=cart
   cart.gsub!(' ','')
   if cart.empty?
     session['secret']='Нужно обязательно заполнить карту!'
@@ -118,7 +127,7 @@ post '/client/cart' do
   prefix=cart[0..4]
   if ['01500','15000'].include?(prefix) then
   else
-    session['secret']='Регистрируем только новую карту!'
+    session['secret']='Регистрируем только фирменную карту!'
     redirect to('/client/cart')
   end
   cart='0'+cart if prefix=='15000'
@@ -136,24 +145,26 @@ post '/client/cart' do
 end
 
 get '/client/new' do
-  @cart=session['cart']
+  @hsh={:cart=>session['cart']}
+  session['cart']=''
   haml :'clients/new'
 end
 
 post '/client/new' do
-  params.each{|key,value| puts "#{key} => #{value}"}
+  # params.each{|key,value| puts "#{key} => #{value}"}
   fl_sms = (params['fl_sms']=='on')
   fl_pol = params['fl_pol']
   mobile = params['phone']
   if mobile.length<17
     mobile=''
+    fl_sms=false;
   else
     mobile='7'+mobile[4..6]+mobile[9..11]+mobile[13..17]
   end
-  puts "'#{mobile}'"
-  puts session['user']
+  #puts "'#{mobile}'"
+  #puts session['user']
 
-  DB.transaction do
+  #DB.transaction do
     clnt = DB[:clients].insert({
                                    :family=>params['surname'],
                                    :name=>params['name'],
@@ -170,17 +181,84 @@ post '/client/new' do
                                 :barcode => session['cart'],
                                 :client_id => clnt
                             })
-    if params['fl_bonuses'=='on'] then
-      value = Float[params['bonuses']] rescue false
+    if (params['fl_bonuses']=='on') then
+      value = Float(params['bonuses']) rescue false
       Bonus.create({:card_id => crd, :cashe_id => session['cashe_id'], :value => value}) if value
     end
-    raise Sequel::Rollback
-  end
+  #  raise Sequel::Rollback
+  #end
   redirect to('/clients')
 end
 
 get '/client/:id/edit' do
-  Client[params[:id]].to_hash.to_s
+  haml :'clients/edit'
+end
+
+post '/client/:id/edit' do
+  id=params[:id]
+  type=params["tab"]
+  if(type=="1")
+    session['secret_type']=type;
+    cart=params["p1_old_cart"];
+    # puts cart
+    cart.gsub!(' ','')
+    if cart.empty?
+      session['secret1']='Нужно обязательно заполнить карту!'
+      redirect to("/client/#{id}/edit")
+    end
+    prefix=cart[0..3]
+    if ['0130','1300'].include?(prefix) then
+    else
+      session['secret1']='Неверный номер старой карты!'
+      redirect to("/client/#{id}/edit")
+    end
+    cart='0'+cart if prefix=='1300'
+    if cart.length!=13 then
+      session['secret1']='Ошибочный номер карты!'
+      redirect to("/client/#{id}/edit")
+    end
+    c=Card[{:barcode=>cart, :client_id=>id}]
+    if c.nil? then
+      session['secret1']="Карта #{cart} у этого клиента не найдена!"
+      redirect to("/client/#{id}/edit")
+    end
+    cart=params["new_cart"];
+    cart.gsub!(' ','')
+    if cart.empty?
+      session['secret2']='Нужно обязательно заполнить карту!'
+      redirect to("/client/#{id}/edit")
+    end
+    prefix=cart[0..4]
+    if ['01500','15000'].include?(prefix) then
+    else
+      session['secret2']='Неверный номер старой карты!'
+      redirect to("/client/#{id}/edit")
+    end
+    cart='0'+cart if prefix=='15000'
+    if cart.length!=13 then
+      session['secret2']='Ошибочный номер карты!'
+      redirect to("/client/#{id}/edit")
+    end
+    cc=Card[{:barcode=>cart}]
+    unless cc.nil? then
+      unless cc.client_id.nil?
+        session['secret2']="Карта #{cart} уже добавлена!"
+        redirect to("/client/#{id}/edit")
+      end
+      DB.transaction do
+        cc.update(:client_id=>c.client_id)
+        c.delete
+      end
+    else
+      c.update(:barcode=>cart)
+    end
+  else
+
+  end
+  session['secret_type']=''
+  session['secret1']=''
+  session['secret2']=''
+  redirect to("/clients")
 end
 
 get '/test' do
