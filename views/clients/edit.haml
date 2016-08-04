@@ -19,7 +19,7 @@
         .row.content
           %label.col-md-4.text-primary.control-label{for: "p1_old_cart"} Прежняя карта
           .col-md-4
-            %input#p1_old_cart.form-control.af.input-md.bfh-phone{name: "p1_old_cart", next_id: "#p1_new_cart", placeholder: "01300 00000 000", autocomplete: "off", :type => "tel", "data-format" => "ddddd ddddd ddd", value: @@hsh[:cart]}/
+            %input#p1_old_cart.form-control.af.input-md.bfh-phone{name: "p1_old_cart", next_id: "#p1_new_cart", placeholder: "01300 00000 000", autocomplete: "off", :type => "tel", "data-format" => "ddddd ddddd ddd", value: @hsh[:cart]}/
           .col-md-2
             .flash#flash.alert-danger
               =session['secret1']
@@ -29,7 +29,7 @@
         .row.content
           %label.col-md-4.text-primary.control-label{for: "p1_new_cart"} Новая карта
           .col-md-4
-            %input#p1_new_cart.form-control.af.input-md.bfh-phone{name: "p1_new_cart", next_id: "#bt", placeholder: "01500 00000 000", autocomplete: "off", :type => "tel", "data-format" => "ddddd ddddd ddd", value:@@hsh[:new_cart]}/
+            %input#p1_new_cart.form-control.af.input-md.bfh-phone{name: "p1_new_cart", next_id: "#bt", placeholder: "01500 00000 000", autocomplete: "off", :type => "tel", "data-format" => "ddddd ddddd ddd", value:@hsh[:new_cart]}/
           .col-md-2
             .flash#flash.alert-danger
               =session['secret2']

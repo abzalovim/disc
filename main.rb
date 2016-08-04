@@ -85,10 +85,11 @@ post '/clients.ajax' do
   cart=params["cart"]
   unless cart.empty?
     cart="0"+cart if cart[0]!="0"
+    cart.gsub!(' ','')
     session['cart']=cart
     return json DB[:clients].left_join(:cards, :client_id=>:id).left_join(:bonuses, :card_id=>:id).where(:clients__id=>DB[:cards].where(:barcode=>cart).select(:client_id))\
-                    .group(:clients__id).select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile,:cards__barcode___cart)\
-                    .select_append{sum(:value).as(bonus)}.limit(20).all
+                    .group(:clients__id).select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile)\
+                    .select_append{max(:barcode).as('cart')}.select_append{sum(:value).as(bonus)}.limit(20).all
   end
   filter=params["filter"]
   unless filter.empty?
@@ -101,12 +102,12 @@ post '/clients.ajax' do
       end
     }
     return json DB[:clients].left_join(:cards, :client_id=>:id).left_join(:bonuses, :card_id=>:id).where(str)\
-                    .group(:clients__id).select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile,:cards__barcode___cart)\
-                    .select_append{sum(:value).as(bonus)}.limit(20).all
+                    .group(:clients__id).select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile)\
+                    .select_append{max(:barcode).as('cart')}.select_append{sum(:value).as(bonus)}.limit(20).all
   end
   json DB[:clients].left_join(:cards, :client_id=>:id).left_join(:bonuses, :card_id=>:id).group(:clients__id)\
-                    .select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile,:cards__barcode___cart)\
-                    .select_append{sum(:value).as(bonus)}.limit(20).all
+                    .select(:clients__id,:clients__family,:clients__name,:clients__surname,:clients__mobile)\
+                    .select_append{max(:barcode).as('cart')}.select_append{sum(:value).as(bonus)}.limit(20).all
   #json { :domain => domain, :info => {:available => info.available?, :registered => info.registered?, :expires => info.expires_on} } unless info.nil?
 end
 
@@ -191,6 +192,10 @@ post '/client/new' do
 end
 
 get '/client/:id/edit' do
+  @hsh={:cart=>session['cart']}
+  @hsh[:new_cart]=session['new_cart']
+  session['cart']=''
+  session['new_cart']=''
   haml :'clients/edit'
 end
 
@@ -198,6 +203,8 @@ post '/client/:id/edit' do
   id=params[:id]
   type=params["tab"]
   if(type=="1")
+    session['cart']=params["p1_old_cart"];
+    session['new_cart']=params["p1_new_cart"];
     session['secret_type']=type;
     cart=params["p1_old_cart"];
     # puts cart
@@ -222,7 +229,7 @@ post '/client/:id/edit' do
       session['secret1']="Карта #{cart} у этого клиента не найдена!"
       redirect to("/client/#{id}/edit")
     end
-    cart=params["new_cart"];
+    cart=params["p1_new_cart"];
     cart.gsub!(' ','')
     if cart.empty?
       session['secret2']='Нужно обязательно заполнить карту!'
@@ -231,7 +238,7 @@ post '/client/:id/edit' do
     prefix=cart[0..4]
     if ['01500','15000'].include?(prefix) then
     else
-      session['secret2']='Неверный номер старой карты!'
+      session['secret2']='Неверный номер новой карты!'
       redirect to("/client/#{id}/edit")
     end
     cart='0'+cart if prefix=='15000'
@@ -258,6 +265,8 @@ post '/client/:id/edit' do
   session['secret_type']=''
   session['secret1']=''
   session['secret2']=''
+  session['cart']=''
+  session['new_cart']=''
   redirect to("/clients")
 end
 
