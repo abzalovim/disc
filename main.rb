@@ -78,6 +78,14 @@ end
 
 get '/clients' do
   session['secret'] = ''
+  session['cart'] = ''
+  session['new_cart']=''
+  session['family']=''
+  session['name']=''
+  session['surname']=''
+  session['city']=''
+  session['mobile']=''
+  session['birthday']=''
   haml :'clients/list'
 end
 
@@ -136,7 +144,7 @@ post '/client/cart' do
     session['secret']='Ошибочный номер карты!'
     redirect to('/client/cart')
   end
-  unless Card[{:barcode=>cart}].nil? then
+  unless Card.where(Sequel.&(Sequel.~(:client_id => nil),:barcode=>cart)).first.nil? then
     session['secret']="Карта #{cart} уже добавлена!"
     redirect to('/client/cart')
   end
@@ -153,6 +161,7 @@ end
 
 post '/client/new' do
   # params.each{|key,value| puts "#{key} => #{value}"}
+  cart = params['cart']
   fl_sms = (params['fl_sms']=='on')
   fl_pol = params['fl_pol']
   mobile = params['phone']
@@ -178,10 +187,15 @@ post '/client/new' do
                                    :city=>params['city'],
                                    :comments=>session['user']
                                })
-    crd = DB[:cards].insert({
-                                :barcode => session['cart'],
-                                :client_id => clnt
-                            })
+    if Card[{:barcode=>cart}].nil?
+      crd = DB[:cards].insert({
+                                  :barcode => cart,
+                                  :client_id => clnt
+                              })
+    else
+      Card[{:barcode=>cart}].update(:client_id => clnt)
+      crd = Card[{:barcode=>cart}][:id]
+    end
     if (params['fl_bonuses']=='on') then
       value = Float(params['bonuses']) rescue false
       Bonus.create({:card_id => crd, :cashe_id => session['cashe_id'], :value => value}) if value
@@ -192,10 +206,27 @@ post '/client/new' do
 end
 
 get '/client/:id/edit' do
+  id=params[:id]
   @hsh={:cart=>session['cart']}
   @hsh[:new_cart]=session['new_cart']
+  cl=Client[id]
+  @hsh[:family]=cl.family
+  @hsh[:name]=cl.name
+  @hsh[:surname]=cl.surname
+  @hsh[:city]=cl.city
+  @hsh[:mobile]=cl.mobile
+  @hsh[:birthday]=cl.birthday
+  @hsh[:m_f]=(cl.m_f!='m')
+  @hsh[:sms]=cl.get_sms
+
   session['cart']=''
   session['new_cart']=''
+  session['family']=''
+  session['name']=''
+  session['surname']=''
+  session['city']=''
+  session['mobile']=''
+  session['birthday']=''
   haml :'clients/edit'
 end
 
@@ -259,8 +290,30 @@ post '/client/:id/edit' do
     else
       c.update(:barcode=>cart)
     end
+  elsif (type=="2")
+    fl_sms = (params['fl_sms']=='true')
+    fl_pol = params['fl_pol']
+    mobile = params['phone']
+    if mobile.length<17
+      mobile=''
+      fl_sms=false;
+    else
+      mobile='7'+mobile[4..6]+mobile[9..11]+mobile[13..17]
+    end
+    cl=Client[id]
+    cl.update({:family=>params['surname'],
+              :name=>params['name'],
+              :surname=>params['lastname'],
+              :m_f=>fl_pol,
+              :birthday=>params['birthday'],
+              :get_sms=>fl_sms,
+              :active=>true,
+              :mobile=>mobile,
+              :city=>params['city'],
+              :comments=>session['user']})
   else
-
+      value = Float(params['bonuses']) rescue false
+      Bonus.create({:card_id => Card[{:client_id=>id}][:id], :cashe_id => session['cashe_id'], :value => value}) if value
   end
   session['secret_type']=''
   session['secret1']=''
