@@ -2,7 +2,7 @@
   .row
     %label.col-md-4.control-label
     %label.col-md-4
-      %h1 Замена карты клиента
+      %h1 Редактирование клиента
   .container-fluid
     %ul.nav.nav-tabs.col-md-8.col-md-offset-2
       - cls = session['secret_type']!="2" ? "active" : ""
@@ -10,7 +10,7 @@
         %a{"data-toggle" => "tab", href: "#panel1"} Замена карты
       - cls = session['secret_type']=="2" ? "active" : ""
       %li.nav{name: "p_name", value: 2, class: cls}
-        %a{"data-toggle" => "tab", href: "#panel2"} Расширенное редактирование
+        %a{"data-toggle" => "tab", href: "#panel2"} Анкетные данные
       %li.nav{name: "p_name", value: 3}
         %a{"data-toggle" => "tab", href: "#panel3"} Начислить бонусы
   .row

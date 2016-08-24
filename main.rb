@@ -207,9 +207,9 @@ end
 
 get '/client/:id/edit' do
   id=params[:id]
-  @hsh={:cart=>session['cart']}
-  @hsh[:new_cart]=session['new_cart']
   cl=Client[id]
+  @hsh={:cart=>Card[:client_id=>id][:barcode]}
+  @hsh[:new_cart]=session['new_cart']
   @hsh[:family]=cl.family
   @hsh[:name]=cl.name
   @hsh[:surname]=cl.surname
@@ -280,12 +280,29 @@ post '/client/:id/edit' do
     cc=Card[{:barcode=>cart}]
     unless cc.nil? then
       unless cc.client_id.nil?
-        session['secret2']="Карта #{cart} уже добавлена!"
-        redirect to("/client/#{id}/edit")
+        fl_new = true
+        n_mobile = Client[cc.client_id][:mobile]
+        o_mobile = Client[c.client_id][:mobile]
+        if o_mobile!=n_mobile
+          session['secret2']="Карта #{cart} уже добавлена у другого клиента!"
+          redirect to("/client/#{id}/edit")
+        else
+          fl_new = false
+        end
       end
       DB.transaction do
-        cc.update(:client_id=>c.client_id)
-        c.delete
+        if fl_new
+          cc.update(:client_id=>c.client_id)
+          Bonus.where(:card_id=>c[:id]).update(:card_id=>cc[:id])
+          Payment.where(:card_id=>c[:id]).update(:card_id=>cc[:id])
+          c.delete
+        else
+          Bonus.where(:card_id=>c[:id]).update(:card_id=>cc[:id])
+          Payment.where(:card_id=>c[:id]).update(:card_id=>cc[:id])
+          ud_client=c[:client_id]
+          c.delete
+          Client[ud_client].delete
+        end
       end
     else
       c.update(:barcode=>cart)
