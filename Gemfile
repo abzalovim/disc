@@ -2,7 +2,7 @@
 source :rubygems
 
 gem 'sinatra'
-gem 'sinatra-contrib'
+gem 'sinatra-contrib', '>=1.4.7'
 #gem 'unicorn'
 #gem 'capistrano'  
 #gem "rvm-capistrano"

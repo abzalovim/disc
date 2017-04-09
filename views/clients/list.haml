@@ -1,0 +1,105 @@
+.container-fluid.form-horizontal
+  .row.content
+    %label.col-sm-2.control-label{for: "cart"} Карта
+    .col-sm-4
+      %input#cart.form-control.input-md.bfh-phone{name: "cart", autocomplete: "off", placeholder: "Карта",
+       style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", "data-format" => "ddddd ddddd ddd",
+        type: "text", value: @hsh.nil? ? '' : @hsh[:cart]}/
+      %span.help-block Фильтр по карте
+      %label
+    %label.col-sm-1.control-label{for: "filter"} Фильтр
+    .col-sm-4
+      %input#filter.form-control.input-md{name: "filter", autocomplete: "off", placeholder: "Фильтр", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+      %span.help-block Фильтр по имени
+      %label
+%form
+  .row
+    -unless session['cashe_id'].nil? then
+      %button.add.col-sm-1.col-sm-offset-2{formaction: "/client/cart", formmethod: "get"}
+        Добавить
+.container
+  .col-sm-12
+    %table{:class=>"table table-striped"}
+      %thead
+        %th='Номер'
+        %th='Клиент'
+        %th='Телефон'
+        %th='Карта'
+        %th='Бонусы'
+        %th=''
+      %tbody#clients
+%ul{:id => 'info'}
+- edit_link = session['cashe_id'].nil? ? '' : "<a href='"+'/client/"+data[i].id+"/edit'+ "' title='Редактировать'>Редактировать</a>"
+:javascript
+  $("input").keyup(function(event){
+    if(event.keyCode == 13){
+      $.post('/clients.ajax', $("input").serialize(), function(data) {
+        if (!data) {
+          alert('Что-то пошло не так (');
+          return;
+        }
+        $('tbody#clients > *').remove();
+        for (var i = 0; i < data.length; i++) {
+          var row = $("<tr />")
+          $('tbody#clients').append(row);
+          row.append($("<td>" + data[i].id + "</td>"));
+          row.append($("<td>" + data[i].family + " " + data[i].name + " " + data[i].surname + "</td>"));
+         if((data[i].mobile=="")||(data[i].mobile==null)){
+            row.append($("<td> - </td>"));
+          }else{
+            var phoneHTML = '<span class="bfh-phone" data-format="+7 (ddd) ddd-dddd" data-number="5555555555"></span>',
+              phone = $(phoneHTML).bfhphone({format: '+7 (ddd) ddd-dddd', number: data[i].mobile});
+            var txt_phone=phone.html();
+            if(txt_phone.length>=17) {txt_phone=txt_phone.substr(0,9)+'**'+txt_phone.substr(11,6);}
+            row.append($("<td>"+txt_phone+"</td>"));
+          }
+          row.append($("<td>" + data[i].cart  + "</td>"));
+          if(data[i].bonus==null){
+            row.append($("<td> - </td>"));
+          }else{
+            row.append($("<td>" + data[i].bonus  + "</td>"));
+          }
+          row.append($("<td>#{edit_link}</td>"));
+        }
+      }, 'json');
+      return false;
+    }
+  });
+  $(document).ready(function() {
+      $('#cart').each(function () {
+        var $phone;
+
+        $phone = $(this);
+
+        $phone.bfhphone($phone.data());
+      });
+      $.post('/clients.ajax', $("input").serialize(), function(data) {
+        if (!data) {
+          alert('Что-то пошло не так (');
+          return;
+        }
+        $('tbody#clients > *').remove();
+        for (var i = 0; i < data.length; i++) {
+          var row = $("<tr />")
+          $('tbody#clients').append(row);
+          row.append($("<td>" + data[i].id + "</td>"));
+          row.append($("<td>" + data[i].family + " " + data[i].name + " " + data[i].surname + "</td>"));
+         if((data[i].mobile=="")||(data[i].mobile==null)){
+            row.append($("<td> - </td>"));
+          }else{
+            var phoneHTML = '<span class="bfh-phone" data-format="+7 (ddd) ddd-dddd" data-number="5555555555"></span>',
+              phone = $(phoneHTML).bfhphone({format: '+7 (ddd) ddd-dddd', number: data[i].mobile});
+            var txt_phone=phone.html();
+            if(txt_phone.length>=17) {txt_phone=txt_phone.substr(0,9)+'**'+txt_phone.substr(11,6);}
+            row.append($("<td>"+txt_phone+"</td>"));
+          }
+          row.append($("<td>" + data[i].cart  + "</td>"));
+          if(data[i].bonus==null){
+            row.append($("<td> - </td>"));
+          }else{
+            row.append($("<td>" + data[i].bonus  + "</td>"));
+          }
+          row.append($("<td>#{edit_link}</td>"));
+        }
+      }, 'json');
+  });

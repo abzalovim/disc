@@ -1,0 +1,104 @@
+%form#components.form-horizontal{role: "form", method: "post"}
+  .row
+    %label.col-md-4.control-label
+    %label.col-md-4
+      %h1 Анкета клиента
+  .container-fluid
+    .row.content
+      %label#cart.text-primary.col-md-4.col-md-offset-4{value: @hsh[:cart]}
+        ="Карта: #{@hsh[:cart]}"
+    .row.content
+      %label.col-md-4.control-label{for: "surname"} Фамилия
+      .col-md-4
+        %input#surname.form-control.af.input-md{name: "surname", next_id: "#name", autocomplete: "off", placeholder: "Фамилия клиента", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+    .row
+      %label.col-md-4.control-label{for: "name"} Имя
+      .col-md-4
+        %input#name.form-control.af.input-md{name: "name", next_id: "#lastname", autocomplete: "off", placeholder: "Имя клиента", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+    .row
+      %label.col-md-4.control-label{for: "lastname"} Отчество
+      .col-md-4
+        %input#lastname.form-control.af.input-md{name: "lastname", next_id: "#city", autocomplete: "off", placeholder: "Отчество клиента", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}/
+    .row
+      %label.col-md-4.control-label{for: "city"} Город
+      .col-md-4
+        %input#city.form-control.af.input-md{name: "city", next_id: "#phone", placeholder: "Город", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}
+    .row
+      %label.col-md-4.control-label{for: "mobile"} Телефон мобильный
+      .col-md-4
+        %input#phone.form-control.af.bfh-phone{"data-format" => "+7 (ddd) ddd-dddd", next_id: "#pol", autocomplete: "off", :name => "phone", :type => "tel", :value => ""}
+    .row
+      %label.col-sm-4.col-xs-5.control-label{for: "fl_pol"}  Пол
+      .col-sm-4.col-xs-3
+        %label.radio-inline
+          %input#pol.af{:name => "fl_pol", next_id: "#birthday", :type => "radio", :value => 'm'}
+          М
+        %label.radio-inline
+          %input.af{:name => "fl_pol", next_id: "#birthday", :type => "radio", :value => 'f', :checked => 1}
+          Ж
+    .row
+      %label.control-label.col-md-4
+    .row
+      %label.control-label.col-xs-4.col-md-4 Дата рождения:
+      .col-md-4.col-xs-4{:id=>"datepicker"}
+        %label.input-group.date
+          %input#birthday.form-control.af{:name => "birthday", next_id: "#fl_sms", :type => "text", autocomplete: "off"}
+          %span.input-group-addon
+            %i.glyphicon.glyphicon-th
+    .row
+      %label.col-sm-4.col-xs-5.control-label{for: "fl_sms"} Соглашаюсь с СМС-рассылкой
+      .col-sm-1.col-xs-1
+        %input#fl_sms.af.form-control.input{name: "fl_sms", next_id: "#fl_bonuses", type: "checkbox"}
+    .row
+      %label.col-sm-4.col-xs-5.text-danger.control-label{for: "bonuses"} Начислить бонусы
+      .col-sm-1.col-xs-1
+        %input#fl_bonuses.fl_check.form-control.input{name: "fl_bonuses", in_id: "#bonuses", type: "checkbox", value: false}
+      .col-sm-3.col-xs-6
+        %input#bonuses.form-control.af.input-md{hidden: 1, next_id: "#bt2", name: "bonuses", autocomplete: "off", style: "cursor: auto; background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;", type: "text"}
+
+    .row
+      %label.control-label.col-md-4
+    .row
+      %button#bt2.submit.col-md-3.col-md-offset-4{:onclick => "return ORLY();"}
+        Сохранить анкету
+
+:javascript
+  $("#datepicker").datetimepicker({
+        language: 'ru',
+        pickTime: false,
+        defaultDate: "01.01.1980",
+        viewMode: 'years',
+        autoclose: true
+      });
+  $(document).ready(function() {
+        $('#fl_bonuses')[0].checked=false;
+        $('#fl_sms')[0].checked=true;
+
+        $('#bonuses').hide();
+  });
+  $('input.fl_check').click(function(e){
+    in_id=$(this).attr("in_id");
+    $(in_id).toggle();
+    if(this.checked) {
+      $(in_id).focus();
+    };
+  });
+  $('input.af').on('keydown', function(event) {
+    if (event.keyCode == 13) {
+      nxt  = $(this).attr("next_id");
+      if(nxt){
+        $(nxt).focus();
+        event.preventDefault();
+      };
+    }
+  });
+  function ORLY(){
+  	return confirm('Сохранить?');
+  }
+  $("form").submit(function(eventObj) {
+    $('<input />').attr('type', 'hidden')
+        .attr('name', "cart")
+        .attr('value', $('#cart').attr("value"))
+        .appendTo('#components');
+    return true;
+  });

@@ -1,0 +1,19 @@
+%form
+  .row
+    -unless session['cashe_id'].nil? then
+      %button.add.col-sm-1.col-sm-offset-2{formaction: "/client/cart", formmethod: "get"}
+        Добавить
+.container
+  %label.col-sm-4.col-sm-offset-4{for: "p_who"} Из: #{Cashe[session['cashe_id']].name}
+  .col-sm-12
+    %table{:class=>"table table-striped"}
+      %thead
+        %th='Номер'
+        %th='Клиент'
+        %th='Телефон'
+        %th='Карта'
+        %th='Бонусы'
+        %th=''
+      %tbody#clients
+%ul{:id => 'info'}
+- edit_link = session['cashe_id'].nil? ? '' : "<a href='"+'/docs/"+data[i].id+"/edit'+ "' title='Редактировать'>Редактировать</a>"

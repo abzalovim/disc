@@ -6,9 +6,14 @@
       %span.icon-bar
   #navbar-main.navbar-collapse.collapse
     %ul.nav.navbar-nav
-      %li
+      - cls = session['block']==0 ? "my_active" : ""
+      %li{class: cls}
+        %a{href: to('/')}='На главную'
+      - cls = session['block']==1 ? "my_active" : ""
+      %li{class: cls}
         %a{href: to('/clients')}='Клиенты'
-      -#%li
-      -#  %a{href: to('#')}=''
+      - cls = session['block']==2 ? "my_active" : ""
+      %li{class: cls}
+        %a{href: to('/docs')}='Заявки на Перемещение'
       -#%li
       -#  %a{href: to('#')}=''

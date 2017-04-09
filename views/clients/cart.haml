@@ -1,0 +1,25 @@
+%form#components.form-horizontal{role: "form", method: "post"}
+  .row
+    %label.col-md-4.control-label
+    %label.col-md-4
+      %h1 Карта клиента
+  .container-fluid
+    .row.content
+      %label.col-md-4.text-primary.control-label{for: "cart"} Карта
+      .col-md-4
+        %input#cart.form-control.input-md.bfh-phone{name: "cart", placeholder: "01500 00000 000", autocomplete: "off", :type => "tel", "data-format" => "ddddd ddddd ddd", value: "#{@hsh[:cart]}"}/
+      .col-md-2
+        .flash#flash.alert-danger
+          =session['secret']
+          -session['secret']=''
+    .row
+      %label.control-label.col-md-4
+    .row
+      %button.submit.col-md-2.col-md-offset-5
+        Проверить карту
+:javascript
+  $(function() {
+    $('#flash').delay(500).fadeIn('normal', function() {
+      $(this).delay(2500).fadeOut();
+    });
+  });

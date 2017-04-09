@@ -62,6 +62,17 @@ DB.create_table?(:articles) do
   DateTime :created_at
 end
 
+DB.create_table?(:documents) do
+  foreign_key :from_id
+  foreign_key :to_id
+  Integer :pairs
+  Integer :bags
+  Integer :others
+  String  :comments
+  DateTime :updated_at
+  DateTime :created_at
+end
+
 class Cashe < Sequel::Model(:cashes)
   one_to_many :bonuses
 end
@@ -92,3 +103,8 @@ class Articles < Sequel::Model(:articles)
   many_to_one :cashes
 end
 
+class Documents < Sequel::Model(:documents)
+  plugin :timestamps
+  many_to_one :from
+  many_to_one :to
+end

@@ -6,12 +6,16 @@ require 'xmlsimple'
 require 'sinatra/respond_with'
 require "sinatra/reloader" if development?
 
+p "state is #{development?}"
+
 get '/' do
+  session['block']=0
   @cashes = Cashe.order(:name).all
   haml :index
 end
 
 get '/start' do
+  session['block']=3
   @cashes = Cashe.order(:name).all
   haml :start, :layout => nil
 end
@@ -77,6 +81,7 @@ get '/cards/:cashe/:check_id/:barcode/:payment/:sum_out/:sum_in/:articles' do
 end
 
 get '/clients' do
+  session['block']=1
   session['secret'] = ''
   session['cart'] = ''
   session['new_cart']=''
@@ -342,6 +347,13 @@ end
 
 get '/test' do
   haml :test
+end
+
+get '/docs' do
+  redirect to("/") if Cashe[session['cashe_id']].nil?
+  session['block']=2
+  @docs =
+  haml :'docs/list'
 end
 
 post '/ajax.json' do

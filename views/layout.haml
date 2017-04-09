@@ -9,14 +9,15 @@
     %script(src="/js/bootstrap-formhelpers-phone.js")
     %link(rel="stylesheet" href="/css/bootstrap.min.css")
     %link(rel="stylesheet" href="/css/bootstrap-datetimepicker.min.css")
+    %link(rel="stylesheet" href="/replace.css")
     %link{:href => "/img/favicon.png", :rel => "galateia icon", :type => "image/png"}/
   %body
     .row
       %img.col-lg-offset-3.col-lg-5.col-md-offset-2.col-md-7.col-sm-offset-1.col-sm-9.col-xs-12(src="/img/brands.png")
-    .row.navbar-nav.navbar-default.col-md-11
-      =haml :navbar
+    .row.navbar-nav.navbar-left.col-md-11
+      = haml :navbar
     .row.nav.navbar-nav.navbar-right.col-md-1
       - if session['cashe_id'].nil? then nav={'Войти' => '/start'}
       - else nav = {session['user'] => {'Выйти' => '/logout'}}
-      =haml :nav_ul, locals: {nav: nav}
+      = haml :nav_ul, locals: {nav: nav}
     = yield

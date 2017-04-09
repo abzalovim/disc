@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Виджет Bootstrap datetimepicker</title>      
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/bootstrap-formhelpers-phone.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+  </head>
+  <body style="margin:40px;">
+  <h1 class="page-header">Виджет Bootstrap datetimepicker</h1>
+  <h2>datetimepicker1</h2>
+  <div class="form-group">
+    <div class="input-group date" id="datetimepicker1">
+      <input type="text" class="form-control" readonly>
+      <span class="input-group-addon">
+        <span class="glyphicon-calendar glyphicon"></span>
+      </span>
+    </div>
+  </div>
+
+  <h2>datetimepicker2</h2>
+  <input type="text" class="form-control" id="datetimepicker2" readonly>
+
+  <script type="text/javascript">
+    $(function () {
+      $('#datetimepicker1').datetimepicker({
+        language: 'ru',
+        pickTime: false,
+        defaultDate: "01.01.1980",
+        viewMode: 'years',
+        autoclose: true
+      });
+      $('#datetimepicker2').datetimepicker({language: 'ru'});
+    });
+  </script>
+
+  <h2>Number</h2>
+  <form action="" method="post" enctype="multipart/form-data" role="form">
+      <input type="tel" name="phone" id="phone" class="form-control bfh-phone" data-format="+7 (ddd) ddd-dddd" value="" >
+  </form>
+  </body>
+</html>
